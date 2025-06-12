@@ -1,0 +1,36 @@
+{
+    "name": "set-github-variable",
+    "version": "1.0.0",
+    "repository": "https://github.com/step-security/set-github-variable",
+    "license": "MIT",
+    "type": "module",
+    "dependencies": {
+        "@actions/core": "^1.10.1",
+        "@actions/github": "^6.0.0",
+        "@octokit/core": "^5.0.2",
+        "@vercel/ncc": "^0.38.3",
+        "axios": "^1.9.0",
+        "node-fetch": "^3.3.2"
+    },
+    "devDependencies": {
+        "eslint": "^7.6.0",
+        "eslint-config-strongloop": "^2.1.0",
+        "eslint-plugin-jsdoc": "^30.2.2",
+        "husky": "^4.2.5",
+        "lint-staged": "^10.2.11"
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "build": "ncc build src/index.js -o dist"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "src/*.js": [
+            "eslint . --fix"
+        ]
+    }
+}
