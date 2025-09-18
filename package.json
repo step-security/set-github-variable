@@ -15,7 +15,7 @@
     "devDependencies": {
         "eslint": "^7.6.0",
         "eslint-config-strongloop": "^2.1.0",
-        "eslint-plugin-jsdoc": "^30.2.2",
+        "eslint-plugin-jsdoc": "^59.0.1",
         "husky": "^4.2.5",
         "lint-staged": "^10.2.11"
     },
