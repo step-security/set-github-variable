@@ -45912,26 +45912,58 @@ axios.default = axios;
 // this module should only have a default export
 /* harmony default export */ const lib_axios = (axios);
 
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(9896);
 ;// CONCATENATED MODULE: ./src/index.js
 
 
 
 
 
-async function validateSubscription() {
-  const API_URL = `https://agent.api.stepsecurity.io/v1/github/${process.env.GITHUB_REPOSITORY}/actions/subscription`;
 
+async function validateSubscription() {
+  let repoPrivate;
+  const eventPath = process.env.GITHUB_EVENT_PATH;
+  if (eventPath && external_fs_.existsSync(eventPath)) {
+    const payload = JSON.parse(external_fs_.readFileSync(eventPath, 'utf8'));
+    repoPrivate = payload?.repository?.private;
+  }
+
+  const upstream = 'mmoyaferrer/set-github-variable';
+  const action = process.env.GITHUB_ACTION_REPOSITORY;
+  const docsUrl =
+    'https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions';
+
+  core.info('');
+  core.info('[1;36mStepSecurity Maintained Action[0m');
+  core.info(`Secure drop-in replacement for ${upstream}`);
+  if (repoPrivate === false)
+    core.info('[32m✓ Free for public repositories[0m');
+  core.info(`[36mLearn more:[0m ${docsUrl}`);
+  core.info('');
+
+  if (repoPrivate === false) return;
+  const serverUrl = process.env.GITHUB_SERVER_URL || 'https://github.com';
+  const body = { action: action || '' };
+
+  if (serverUrl !== 'https://github.com') body.ghes_server = serverUrl;
   try {
-    await lib_axios.get(API_URL, { timeout: 3000 });
+    await lib_axios.post(
+      `https://agent.api.stepsecurity.io/v1/github/${process.env.GITHUB_REPOSITORY}/actions/maintained-actions-subscription`,
+      body,
+      { timeout: 3000 },
+    );
   } catch (error) {
-    if (error.response && error.response.status === 403) {
+    if (lib_axios.isAxiosError(error) && error.response?.status === 403) {
       core.error(
-        'Subscription is not valid. Reach out to support@stepsecurity.io'
+        '[1;31mThis action requires a StepSecurity subscription for private repositories.[0m',
+      );
+      core.error(
+        `[31mLearn how to enable a subscription: ${docsUrl}[0m`,
       );
       process.exit(1);
-    } else {
-      core.info('Timeout or API not reachable. Continuing to next step.');
     }
+    core.info('Timeout or API not reachable. Continuing to next step.');
   }
 }
 
